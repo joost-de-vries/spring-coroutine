@@ -1,0 +1,104 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.41'
+    id "com.jfrog.bintray" version "1.7.3"
+    id "maven-publish"
+}
+group 'spring-coroutine'
+version '0.1-SNAPSHOT'
+repositories {
+    jcenter()
+}
+sourceCompatibility = 1.8
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    compileOnly(group: 'org.springframework', name: 'spring-context', version: springVersion)
+
+}
+compileKotlin {
+    kotlinOptions{
+        jvmTarget = "1.8"
+        freeCompilerArgs = ["-Xjsr305=strict",
+        "-Xuse-experimental=kotlin.Experimental"
+        ]
+    }
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+bintray {
+    user = "joost-de-vries"
+    key = System.getenv('BINTRAY_KEY')
+    dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
+    publish = false //[Default: false] Whether version should be auto published after an upload
+    override = false //[Default: false] Whether to override version artifacts already published
+    publications = ['Bintray']
+    pkg {
+        repo = 'maven'
+        name = 'spring-coroutine'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'git@github.com:joost-de-vries/spring-coroutine.git'
+        websiteUrl = 'https://github.com/joost-de-vries/spring-coroutine'
+        labels = ['spring', 'kotlin', 'coroutine']
+        version {
+            name = project.version
+            vcsTag = "release-${project.version}"
+        }
+        githubRepo = 'joost-de-vries/spring-coroutine'
+        githubReleaseNotesFile = 'readme.md'
+    }
+}
+
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    from sourceSets.main.kotlin
+}
+
+task javadocJar (type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        Bintray(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier 'sources'
+            }
+
+            artifact javadocJar {
+                classifier 'javadoc'
+            }
+
+            pom.withXml {
+                asNode().children().last() + {
+                    resolveStrategy = Closure.DELEGATE_FIRST
+
+                    name 'spring-coroutine'
+                    description 'Run Kotlin coroutines on Spring Boot taskscheduler.'
+                    url 'https://github.com/joost-de-vries/spring-coroutine'
+                    scm {
+                        url 'https://github.com/joost-de-vries/spring-coroutine.git'
+                        tag project.version
+                    }
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
