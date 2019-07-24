@@ -1,3 +1,10 @@
+Archived. Use 
+```kotlin
+Executor.asCorasCoroutineDispatcher()
+``` 
+on `TaskExecutor` instead.
+
+
 # Run Kotlin coroutines on Spring TaskScheduler
 
 Makes it possible to run Kotlin coroutines in existing Spring Boot applications.
