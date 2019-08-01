@@ -1,14 +1,39 @@
-Archived. Use 
+# Kotlin Spring CoroutineScope
+Run Kotlin coroutines scoped to a Spring framework bean. Provides a Spring `CoroutineScope` that hooks into Spring bean lifecycle.
+
+
+Add `compile("it.the-source:dispatcher:0.2")`
+to your dependencies and use it like this
 ```kotlin
-Executor.asCorasCoroutineDispatcher()
-``` 
-on `TaskExecutor` instead.
+class MySpringBean(dispatcher: CoroutineDispatcher) : MyAbstractBean(), SpringScope by SpringScope(dispatcher) {
+    init {
+        launch {
+            while (true) {
+                delay(100.hours)
+            }
+        }.invokeOnCompletion {
+            println("my spring bean is being destroyed")
+        }
+    }
+}
+```
 
+Coroutines started within the Spring bean will be scoped to the lifecycle of the bean. That is they will be cancelled on Spring [destroy](https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#beans-factory-lifecycle).   
+If you want to append additional elements to the  scope, use `CoroutineScope.plus` operator:
+```kotlin
+val scope = SpringScope() + CoroutineName("MyActivity")
+```
+If you want a `SupervisorJob` parent
+```kotlin
+class MySpringBean(dispatcher: CoroutineDispatcher) : SpringScope by SpringScope(dispatcher, SupervisorJob()) {
 
-# Run Kotlin coroutines on Spring TaskScheduler
+}
+```
 
-Makes it possible to run Kotlin coroutines in existing Spring Boot applications.
+If you want to use `Dispatchers.Default` you can leave out the dispatcher argument
+If you want a `SupervisorJob` parent
+```kotlin
+class MySpringBean() : SpringScope by SpringScope() {
 
-All credit goes to [Konrad Kaminski](https://github.com/konrad-kaminski). 
-This exists because the implementation is currently [private](https://github.com/konrad-kaminski/spring-kotlin-coroutine/blob/master/spring-kotlin-coroutine/src/main/kotlin/org/springframework/kotlin/coroutine/context/resolver/TaskSchedulerCoroutineContextResolver.kt).
-
+}
+```

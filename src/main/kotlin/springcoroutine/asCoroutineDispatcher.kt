@@ -27,8 +27,10 @@ import java.util.Date
 import java.util.concurrent.ScheduledFuture
 import kotlin.coroutines.CoroutineContext
 
-/** Allows running of coroutines on the spring taskscheduler */
-// from https://github.com/konrad-kaminski/spring-kotlin-coroutine/blob/master/spring-kotlin-coroutine/src/main/kotlin/org/springframework/kotlin/coroutine/context/resolver/TaskSchedulerCoroutineContextResolver.kt
+/** Allows running of coroutines on the spring taskscheduler.
+ * Although running on a Spring managed TaskExecutor and using [Executor.asCoroutineDispatcher()] is a better idea.
+ */
+// Copied since it's private in ttps://github.com/konrad-kaminski/spring-kotlin-coroutine/blob/master/spring-kotlin-coroutine/src/main/kotlin/org/springframework/kotlin/coroutine/context/resolver/TaskSchedulerCoroutineContextResolver.kt
 @ExperimentalCoroutinesApi
 fun TaskScheduler.asCoroutineDispatcher(): CoroutineContext =
     TaskSchedulerDispatcher(this)
