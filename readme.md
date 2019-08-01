@@ -23,15 +23,14 @@ If you want to append additional elements to the  scope, use `CoroutineScope.plu
 ```kotlin
 val scope = SpringScope() + CoroutineName("MyActivity")
 ```
-If you want a `SupervisorJob` parent
+If you want a [SupervisorJob](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-supervisor-job.html) parent
 ```kotlin
 class MySpringBean(dispatcher: CoroutineDispatcher) : SpringScope by SpringScope(dispatcher, SupervisorJob()) {
 
 }
 ```
 
-If you want to use `Dispatchers.Default` you can leave out the dispatcher argument
-If you want a `SupervisorJob` parent
+If you want to use [Dispatchers.Default](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-default.html) you can leave out the dispatcher argument
 ```kotlin
 class MySpringBean() : SpringScope by SpringScope() {
 
