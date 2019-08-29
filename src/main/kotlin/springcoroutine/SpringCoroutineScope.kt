@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import org.springframework.beans.factory.DisposableBean
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Creates the [CoroutineScope] for Spring beans.
@@ -35,8 +36,12 @@ interface SpringScope : CoroutineScope, DisposableBean {
 }
 
 @Suppress("FunctionName")
-fun SpringScope(dispatcher: CoroutineDispatcher = Dispatchers.Default, job: Job = Job()): SpringScope = object :
-    SpringScope, CoroutineScope by CoroutineScope(dispatcher + job), DisposableBean {
+fun SpringScope(dispatcher: CoroutineDispatcher = Dispatchers.Default, job: Job = Job()): SpringScope =
+    SpringScope(dispatcher+job)
+
+@Suppress("FunctionName")
+fun SpringScope(coroutineContext: CoroutineContext): SpringScope = object :
+    SpringScope, CoroutineScope by CoroutineScope(coroutineContext), DisposableBean {
     override val job: Job
         get() = coroutineContext[Job]!!
 

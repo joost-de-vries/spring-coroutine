@@ -2,7 +2,7 @@
 Run Kotlin coroutines scoped to a Spring framework bean. Provides a Spring `CoroutineScope` that hooks into Spring bean lifecycle.
 
 
-Add `compile("it.the-source:dispatcher:0.2")`
+Add `compile("it.the-source:dispatcher:0.3")`
 to your dependencies and use it like this
 ```kotlin
 class MySpringBean(dispatcher: CoroutineDispatcher) : MyAbstractBean(), SpringScope by SpringScope(dispatcher) {
@@ -36,3 +36,11 @@ class MySpringBean() : SpringScope by SpringScope() {
 
 }
 ```
+
+You can also provide arbitrary coroutine context values:
+```kotlin
+class MySpringBean() : SpringScope by SpringScope(Dispatchers.Default + SupervisorJob()) {
+
+}
+```
+
